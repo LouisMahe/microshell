@@ -6,7 +6,7 @@
 /*   By: lmahe <lmahe@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 09:48:00 by lmahe             #+#    #+#             */
-/*   Updated: 2024/02/02 12:03:16 by lmahe            ###   ########.fr       */
+/*   Updated: 2024/02/04 11:29:19 by lmahe            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,12 @@ int	next_newl(char **argv, int argc)
 }
 
 
-int	ft_cd(char *path, int argc)
+int	ft_cd(char **argv, int argc)
 {
 	if (argc != 2)
 		return (error("error: cd: bad arguments", NULL));
-	if (chdir(path))
-		return (error("error: cd: cannot change directory to ", "path"));
+	if (chdir(argv[1]))
+		return (error("error: cd: cannot change directory to ", argv[1]));
 	return (0);
 }
 
@@ -76,6 +76,12 @@ int	exec_cmd(char **argv, char **env, int argc, int *oldfd, int *fd)
 {
 	int	id;
 
+	if (!strcmp(argv[0], "cd"))
+		{
+			if (ft_cd(argv, argc))
+				return (1);
+			return (0);
+		}
 	if ((id = fork()) < 0)
 		fork_error(fd);
 	if (id == 0)
