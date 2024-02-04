@@ -6,7 +6,7 @@
 /*   By: lmahe <lmahe@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 09:48:00 by lmahe             #+#    #+#             */
-/*   Updated: 2024/02/04 11:29:19 by lmahe            ###   ########.fr       */
+/*   Updated: 2024/02/04 12:30:14 by lmahe            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,13 @@
 #include <sys/wait.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
+
+void	handler(int sign)
+{
+	(void)sign;
+	write(2, "Quit (core dumped)\n", 19);
+}
 
 int	error(char *str, char *name)
 {
@@ -84,6 +91,8 @@ int	exec_cmd(char **argv, char **env, int argc, int *oldfd, int *fd)
 		}
 	if ((id = fork()) < 0)
 		fork_error(fd);
+	if (id)
+		signal(SIGQUIT, &handler);
 	if (id == 0)
 	{
 		argv[argc] = 0;
@@ -157,6 +166,7 @@ int	main(int argc, char **argv, char **env)
 		exec_line(argv, env, i, NULL);
 		while (wait(NULL) != -1)
 			continue;
+		signal(SIGQUIT, SIG_DFL);
 		if (i == argc || i == argc - 1)
 			break ;
 		argv += i + 1;
